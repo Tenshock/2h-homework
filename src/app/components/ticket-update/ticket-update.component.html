@@ -1,0 +1,51 @@
+<h2>{{isNewEntity ? 'Create a Ticket' : 'Ticket'}}</h2>
+<div class="spinner-border" role="status" *ngIf="isLoadingFromApi">
+    <span class="sr-only">Loading...</span>
+</div>
+
+<div class="alert alert-danger" role="alert" *ngIf="isError">
+    Something went wrong. Please try again 🙌🏼
+</div>
+
+<form name="editForm" role="form" (ngSubmit)="save()" [formGroup]="editForm">
+    <div class="form-group" *ngIf="!isNewEntity">
+        <label class="form-control-label" for="field_id" readonly>Id</label>
+        <input type="text" class="form-control" name="id" id="field_id"
+               formControlName="id" readonly/>
+    </div>
+
+    <div class="form-group">
+        <label class="form-control-label" for="field_desc" readonly>Description</label>
+        <textarea class="form-control" name="description" id="field_desc"
+                  formControlName="description" [readonly]="!isNewEntity"></textarea>
+    </div>
+
+    <div class="form-row">
+        <div class="col">
+            <label class="form-control-label" for="field_assignee" readonly>Assignee</label>
+            <select class="form-control" name="assigneeId" formControlName="assigneeId" id="field_assignee">
+                <ng-container *ngFor="let user of users">
+                    <option [value]="user.id">{{user.name}}</option>
+                </ng-container>
+            </select>
+        </div>
+        <div class="col">
+            <label class="form-control-label" for="field_completed">Completed</label>
+            <select class="form-control" name="completed" formControlName="completed" id="field_completed">
+                    <option [ngValue]="true">True</option>
+                    <option [ngValue]="false">False</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="p-4 d-flex flex-row-reverse">
+        <button type="submit" [disabled]="editForm.invalid || isLoadingFromApi" class="btn btn-primary ml-4">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>{{isNewEntity ? 'Add the ticket' : 'Save modifications'}}</span>
+        </button>
+
+        <button type="button" class="btn btn-secondary" (click)="previousState()">
+            <span>Cancel</span>
+        </button>
+    </div>
+</form>

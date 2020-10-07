@@ -1,0 +1,39 @@
+<div class="container p-4 d-flex flex-row-reverse">
+    <button type="button" class="btn btn-primary" [routerLink]="['/tickets', 'new']">+ Add a new ticket</button>
+</div>
+
+<div class="alert alert-danger" role="alert" *ngIf="isError">
+    Something went wrong. Please try again 🙌🏼
+</div>
+<table class="table">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Description</th>
+        <th scope="col">Assignee</th>
+        <th scope="col">Completed</th>
+        <th scope="col">View</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngIf="isLoadingFromApi; else table">
+        <td *ngFor="let i of Array(5)">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </td>
+    </tr>
+    <ng-template #table>
+        <ng-container *ngFor="let ticket of tickets">
+            <tr>
+                <th scope="row">{{ticket.id}}</th>
+                <td>{{ticket.description}}</td>
+                <td>{{users?.get(ticket.assigneeId)}}</td>
+                <td><input type="checkbox" class="form-check-input" [checked]="ticket.completed"
+                           (click)="updateTicketStatus(ticket.id, !ticket.completed)" [disabled]="isUpdating"></td>
+                <td><a [routerLink]="['/tickets', ticket.id]">View</a></td>
+            </tr>
+        </ng-container>
+    </ng-template>
+    </tbody>
+</table>

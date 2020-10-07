@@ -1,5 +1,7 @@
 # Betclic Coding Assignment 2020
 
+## Time spent on submission: 2h30
+
 The goal of this assignment is to showcase your ability to develop features and your coding style.
 Due to the time constraint you will have to prioritize what you work on,
 and have to try to balance cleanliness with just getting it done.

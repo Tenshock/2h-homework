@@ -1,17 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
-import { Ticket } from '../interfaces/ticket.interface';
-import { User } from '../interfaces/user.interface';
+import {Injectable} from '@angular/core';
+import {Observable, of, throwError} from 'rxjs';
+import {delay, tap} from 'rxjs/operators';
+import {Ticket} from '../interfaces/ticket.interface';
+import {User} from '../interfaces/user.interface';
 
 /**
  * This service acts as a mock back-end.
  * It has some intentional errors that you might have to fix.
  */
-
-function randomDelay() {
-    return Math.random() * 4000;
-}
 
 @Injectable()
 export class BackendService {
@@ -27,30 +23,50 @@ export class BackendService {
             completed: false,
             assigneeId: 111,
             description: 'Move the desk to the new location'
+        },
+        {
+            id: 2,
+            completed: true,
+            assigneeId: 222,
+            description: 'Check connectivity'
+        },
+        {
+            id: 3,
+            completed: false,
+            assigneeId: 111,
+            description: 'Put plants on the desk'
         }
     ];
 
-    public storedUsers: User[] = [{ id: 111, name: 'Victor' }];
+    public storedUsers: User[] = [
+        {id: 111, name: 'Victor'},
+        {id: 222, name: 'Marine'}
+    ];
 
-    private lastId: number = 1;
-
-    private findUserById = id => this.storedUsers.find((user: User) => user.id === +id);
-    private findTicketById = id => this.storedTickets.find((ticket: Ticket) => ticket.id === +id);
+    private lastId: number = 3;
 
     public tickets(): Observable<Ticket[]> {
-        return of(this.storedTickets).pipe(delay(randomDelay()));
+        return of(this.storedTickets).pipe(delay(this.randomDelay()));
     }
 
     public ticket(id: number): Observable<Ticket> {
-        return of(this.findTicketById(id)).pipe(delay(randomDelay()));
+        const result = this.findTicketById(id);
+
+        return result ?
+            of(result).pipe(delay(this.randomDelay()))
+            : throwError(new Error('ticket not found'));
     }
 
     public users(): Observable<User[]> {
-        return of(this.storedUsers).pipe(delay(randomDelay()));
+        return of(this.storedUsers).pipe(delay(this.randomDelay()));
     }
 
     public user(id: number): Observable<User> {
-        return of(this.findUserById(id)).pipe(delay(randomDelay()));
+        const result = this.findUserById(id);
+
+        return result ?
+            of(result).pipe(delay(this.randomDelay()))
+            : throwError(new Error('user not found'));
     }
 
     public newTicket(payload: { description: string }): Observable<Ticket> {
@@ -62,7 +78,7 @@ export class BackendService {
         };
 
         return of(newTicket).pipe(
-            delay(randomDelay()),
+            delay(this.randomDelay()),
             tap((ticket: Ticket) => this.storedTickets.push(ticket))
         );
     }
@@ -73,7 +89,7 @@ export class BackendService {
 
         if (foundTicket && user) {
             return of(foundTicket).pipe(
-                delay(randomDelay()),
+                delay(this.randomDelay()),
                 tap((ticket: Ticket) => {
                     ticket.assigneeId = +userId;
                 })
@@ -88,13 +104,20 @@ export class BackendService {
 
         if (foundTicket) {
             return of(foundTicket).pipe(
-                delay(randomDelay()),
+                delay(this.randomDelay()),
                 tap((ticket: Ticket) => {
-                    ticket.completed = true;
+                    ticket.completed = completed;
                 })
             );
         }
 
         return throwError(new Error('ticket not found'));
     }
+
+    public randomDelay() {
+        return Math.random() * 4000;
+    }
+
+    private findUserById = id => this.storedUsers.find((user: User) => user.id === +id);
+    private findTicketById = id => this.storedTickets.find((ticket: Ticket) => ticket.id === +id);
 }
